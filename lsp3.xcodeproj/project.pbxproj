@@ -15,6 +15,9 @@
 		049DA68E1BF30ECA00D28F41 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 049DA68C1BF30ECA00D28F41 /* LaunchScreen.storyboard */; };
 		049DA6991BF30ECA00D28F41 /* lsp3Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049DA6981BF30ECA00D28F41 /* lsp3Tests.swift */; };
 		049DA6A41BF30ECA00D28F41 /* lsp3UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049DA6A31BF30ECA00D28F41 /* lsp3UITests.swift */; };
+		04A0BF851BF414F900006DB1 /* signs_parking.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 04A0BF841BF414F900006DB1 /* signs_parking.geojson */; };
+		04EB092F1BF32447006F4603 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04EB092E1BF32447006F4603 /* SwiftyJSON.framework */; };
+		BB1F91492A5DD8EEC73E5924 /* Pods_lsp3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3158653B5D7E0C03F7A3957B /* Pods_lsp3.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +52,11 @@
 		049DA69F1BF30ECA00D28F41 /* lsp3UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = lsp3UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		049DA6A31BF30ECA00D28F41 /* lsp3UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = lsp3UITests.swift; sourceTree = "<group>"; };
 		049DA6A51BF30ECA00D28F41 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04A0BF841BF414F900006DB1 /* signs_parking.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = signs_parking.geojson; sourceTree = "<group>"; };
+		04EB092E1BF32447006F4603 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = "Pods/../build/Debug-iphoneos/SwiftyJSON.framework"; sourceTree = "<group>"; };
+		3158653B5D7E0C03F7A3957B /* Pods_lsp3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_lsp3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		97571E7D36B97ED46FD6BA3C /* Pods-lsp3.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lsp3.debug.xcconfig"; path = "Pods/Target Support Files/Pods-lsp3/Pods-lsp3.debug.xcconfig"; sourceTree = "<group>"; };
+		EA29320FFB96F47F7D5BFFD4 /* Pods-lsp3.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-lsp3.release.xcconfig"; path = "Pods/Target Support Files/Pods-lsp3/Pods-lsp3.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +64,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04EB092F1BF32447006F4603 /* SwiftyJSON.framework in Frameworks */,
+				BB1F91492A5DD8EEC73E5924 /* Pods_lsp3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +93,8 @@
 				049DA6971BF30ECA00D28F41 /* lsp3Tests */,
 				049DA6A21BF30ECA00D28F41 /* lsp3UITests */,
 				049DA67E1BF30ECA00D28F41 /* Products */,
+				81131296083AC0F0A4624441 /* Pods */,
+				55484D0DCA3F6093D020767A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -106,6 +118,7 @@
 				049DA68C1BF30ECA00D28F41 /* LaunchScreen.storyboard */,
 				049DA68F1BF30ECA00D28F41 /* Info.plist */,
 				049DA6871BF30ECA00D28F41 /* lsp3.xcdatamodeld */,
+				04A0BF841BF414F900006DB1 /* signs_parking.geojson */,
 			);
 			path = lsp3;
 			sourceTree = "<group>";
@@ -128,6 +141,24 @@
 			path = lsp3UITests;
 			sourceTree = "<group>";
 		};
+		55484D0DCA3F6093D020767A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				04EB092E1BF32447006F4603 /* SwiftyJSON.framework */,
+				3158653B5D7E0C03F7A3957B /* Pods_lsp3.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		81131296083AC0F0A4624441 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				97571E7D36B97ED46FD6BA3C /* Pods-lsp3.debug.xcconfig */,
+				EA29320FFB96F47F7D5BFFD4 /* Pods-lsp3.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -135,9 +166,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 049DA6A81BF30ECA00D28F41 /* Build configuration list for PBXNativeTarget "lsp3" */;
 			buildPhases = (
+				F528DC3DB42A425D1CC297D0 /* Check Pods Manifest.lock */,
 				049DA6791BF30ECA00D28F41 /* Sources */,
 				049DA67A1BF30ECA00D28F41 /* Frameworks */,
 				049DA67B1BF30ECA00D28F41 /* Resources */,
+				A711E6C67F434337EBC18794 /* Embed Pods Frameworks */,
+				F3EB49265CAED308FF224A86 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -238,6 +272,7 @@
 				049DA68E1BF30ECA00D28F41 /* LaunchScreen.storyboard in Resources */,
 				049DA68B1BF30ECA00D28F41 /* Assets.xcassets in Resources */,
 				049DA6861BF30ECA00D28F41 /* Main.storyboard in Resources */,
+				04A0BF851BF414F900006DB1 /* signs_parking.geojson in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,6 +291,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A711E6C67F434337EBC18794 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-lsp3/Pods-lsp3-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F3EB49265CAED308FF224A86 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-lsp3/Pods-lsp3-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F528DC3DB42A425D1CC297D0 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		049DA6791BF30ECA00D28F41 /* Sources */ = {
@@ -404,8 +487,13 @@
 		};
 		049DA6A91BF30ECA00D28F41 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 97571E7D36B97ED46FD6BA3C /* Pods-lsp3.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = lsp3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.lastreetpark.lsp3;
@@ -415,8 +503,13 @@
 		};
 		049DA6AA1BF30ECA00D28F41 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA29320FFB96F47F7D5BFFD4 /* Pods-lsp3.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = lsp3/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.lastreetpark.lsp3;
@@ -491,6 +584,7 @@
 				049DA6AA1BF30ECA00D28F41 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		049DA6AB1BF30ECA00D28F41 /* Build configuration list for PBXNativeTarget "lsp3Tests" */ = {
 			isa = XCConfigurationList;
@@ -499,6 +593,7 @@
 				049DA6AD1BF30ECA00D28F41 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		049DA6AE1BF30ECA00D28F41 /* Build configuration list for PBXNativeTarget "lsp3UITests" */ = {
 			isa = XCConfigurationList;
@@ -507,6 +602,7 @@
 				049DA6B01BF30ECA00D28F41 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
