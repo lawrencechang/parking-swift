@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		047B624B1BFB139C00023FD3 /* kingpin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047B624A1BFB139C00023FD3 /* kingpin.framework */; };
 		049DA6811BF30ECA00D28F41 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049DA6801BF30ECA00D28F41 /* AppDelegate.swift */; };
 		049DA6831BF30ECA00D28F41 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049DA6821BF30ECA00D28F41 /* ViewController.swift */; };
 		049DA6861BF30ECA00D28F41 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 049DA6841BF30ECA00D28F41 /* Main.storyboard */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		047B624A1BFB139C00023FD3 /* kingpin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = kingpin.framework; path = "Pods/../build/Debug-iphoneos/kingpin.framework"; sourceTree = "<group>"; };
 		049DA67D1BF30ECA00D28F41 /* lsp3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = lsp3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049DA6801BF30ECA00D28F41 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049DA6821BF30ECA00D28F41 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				047B624B1BFB139C00023FD3 /* kingpin.framework in Frameworks */,
 				04EB092F1BF32447006F4603 /* SwiftyJSON.framework in Frameworks */,
 				BB1F91492A5DD8EEC73E5924 /* Pods_lsp3.framework in Frameworks */,
 			);
@@ -144,6 +147,7 @@
 		55484D0DCA3F6093D020767A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				047B624A1BFB139C00023FD3 /* kingpin.framework */,
 				04EB092E1BF32447006F4603 /* SwiftyJSON.framework */,
 				3158653B5D7E0C03F7A3957B /* Pods_lsp3.framework */,
 			);

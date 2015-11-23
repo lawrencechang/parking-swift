@@ -11,6 +11,7 @@ import SwiftyJSON
 import CoreData
 import MapKit
 import CoreLocation
+import kingpin
 
 class ViewController: UIViewController {
 
@@ -18,12 +19,13 @@ class ViewController: UIViewController {
     var locations = [NSManagedObject]()
     // Notes:
     // Quite choppy at 3k annotations
-    let MAX_ANNOTATIONS = 1000;
+    let MAX_ANNOTATIONS = 10000;
+    
+    private var clusteringController : KPClusteringController!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        self.mapView.delegate = self;
         initialize();
     }
     
@@ -35,13 +37,14 @@ class ViewController: UIViewController {
 /*
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated);
-        
     }
 */
     
     // func - if num elements in core data is 0, load from JSON
     //        else load to array?
     func initialize() {
+        centerMap();
+        
         print ("Checking for existing data in Core Data.");
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext
@@ -63,7 +66,6 @@ class ViewController: UIViewController {
             print("Core data populated already. Loaded "+String(locations.count)+" locations.");
         }
 
-        centerMap();
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             self.annotations();
         }
@@ -147,19 +149,31 @@ class ViewController: UIViewController {
     func annotations() {
         print("Creating annotations.");
         
-        var annotations = [MKAnnotation]();
-        for location in self.locations {
-            let annotation = MKPointAnnotation();
-            annotation.coordinate = CLLocationCoordinate2DMake(location.valueForKey("latitude") as! Double, location.valueForKey("longitude") as! Double);
-            annotation.title = location.valueForKey("text") as? String;
-            annotation.subtitle = String(location.valueForKey("objectid") as! Int);
-            annotations.append(annotation);
-            if annotations.count >= MAX_ANNOTATIONS {
-                break;
-            }
-        }
+        //kingpin
+        let algorithm : KPGridClusteringAlgorithm = KPGridClusteringAlgorithm()
+        algorithm.annotationSize = CGSizeMake(25, 50)
+        //algorithm.clusteringStrategy = KPGridClusteringAlgorithmStrategy.TwoPhase;
+        algorithm.clusteringStrategy = KPGridClusteringAlgorithmStrategy.Basic;
+        clusteringController = KPClusteringController(mapView: self.mapView, clusteringAlgorithm: algorithm)
+        clusteringController.delegate = self // If you want to use delegate methods
+        
+        self.mapView.delegate = self;
+        
         dispatch_async(dispatch_get_global_queue(Int(QOS_CLASS_UTILITY.rawValue), 0)) {
-            self.mapView.addAnnotations(annotations);
+            var annotations = [MKAnnotation]();
+            for location in self.locations {
+                let annotation = MKPointAnnotation();
+                annotation.coordinate = CLLocationCoordinate2DMake(location.valueForKey("latitude") as! Double, location.valueForKey("longitude") as! Double);
+                annotation.title = location.valueForKey("text") as? String;
+                annotation.subtitle = String(location.valueForKey("objectid") as! Int);
+                annotations.append(annotation);
+                if annotations.count >= self.MAX_ANNOTATIONS {
+                    break;
+                }
+            }
+            //self.mapView.addAnnotations(annotations);
+            // kingpin
+            self.clusteringController.setAnnotations(annotations);
             print("Done adding annotations.");
         }
     }
@@ -184,7 +198,7 @@ extension ViewController : MKMapViewDelegate {
         return annotationView
     }
     
-    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+    func mapView(mapView: MKMapView, viewForAnnotationReuse annotation: MKAnnotation) -> MKAnnotationView? {
         var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("reuse");
         if annotationView != nil {
             annotationView!.annotation = annotation;
@@ -201,5 +215,68 @@ extension ViewController : MKMapViewDelegate {
         //annotationView.canShowCallout = true; // For title pop up
         return annotationView
     }
+    
+    
+    
+    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+        if annotation is MKUserLocation {
+            // return nil so map view draws "blue dot" for standard user location
+            return nil
+        }
+        var annotationView : MKPinAnnotationView?
+        if annotation is KPAnnotation {
+            let a = annotation as! KPAnnotation
+            if a.isCluster() {
+                annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("cluster") as? MKPinAnnotationView
+                if (annotationView == nil) {
+                    annotationView = MKPinAnnotationView(annotation: a, reuseIdentifier: "cluster")
+                }
+                annotationView!.pinTintColor = UIColor.purpleColor();
+            }
+            else {
+                annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("pin") as? MKPinAnnotationView
+                if (annotationView == nil) {
+                    annotationView = MKPinAnnotationView(annotation: a, reuseIdentifier: "pin")
+                }
+                annotationView!.pinTintColor = UIColor.redColor();
+            }
+            annotationView!.canShowCallout = true;
+        }
+        return annotationView;
+    }
+    
+    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+        self.clusteringController.refresh(true)
+    }
+    
+    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+        if view.annotation is KPAnnotation {
+            let cluster = view.annotation as! KPAnnotation
+            
+            if cluster.annotations.count > 1 {
+                let region = MKCoordinateRegionMakeWithDistance(cluster.coordinate,
+                    cluster.radius * 2.5,
+                    cluster.radius * 2.5)
+                
+                mapView.setRegion(region, animated: true)
+            }
+        }
+    }
+}
+
+extension ViewController : KPClusteringControllerDelegate {
+    func clusteringControllerShouldClusterAnnotations(clusteringController: KPClusteringController!) -> Bool {
+        // Smaller number, takes more zooming in to turn off clustering
+        return self.mapView.region.span.latitudeDelta > 0.006;
+    }
+    
+    func clusteringController(clusteringController: KPClusteringController!, configureAnnotationForDisplay annotation: KPAnnotation!) {
+        if annotation.isCluster() {
+            
+        } else {
+            
+        }
+    }
+    
 }
 
