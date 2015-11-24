@@ -162,7 +162,7 @@ class ViewController: UIViewController {
         
         self.mapView.delegate = self;
         
-        dispatch_async(dispatch_get_global_queue(Int(QOS_CLASS_UTILITY.rawValue), 0)) {
+        dispatch_async(dispatch_get_main_queue()) {
             var annotations = [MKAnnotation]();
             for location in self.locations {
                 let annotation = MKPointAnnotation();
@@ -175,9 +175,11 @@ class ViewController: UIViewController {
                 }
             }
             //self.mapView.addAnnotations(annotations);
+            
             // kingpin
             self.clusteringController.setAnnotations(annotations);
             print("Done adding annotations.");
+            self.clusteringController.refresh(true); // To trigger displaying the annotations in the beginning
         }
     }
     
@@ -188,6 +190,7 @@ class ViewController: UIViewController {
 }
 
 extension ViewController : MKMapViewDelegate {
+    /*
     func mapView(mapView: MKMapView, viewForAnnotationSlow annotation: MKAnnotation) -> MKAnnotationView? {
         // simple and inefficient example
         let annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "reuse identifier string");
@@ -218,8 +221,7 @@ extension ViewController : MKMapViewDelegate {
         //annotationView.canShowCallout = true; // For title pop up
         return annotationView
     }
-    
-    
+    */    
     
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
