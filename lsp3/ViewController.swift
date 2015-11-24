@@ -26,6 +26,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        mapView.rotateEnabled = false;
+        mapView.pitchEnabled = false;
+        mapView.showsUserLocation = true; // This seems to do nothing on its own
         initialize();
     }
     
@@ -218,7 +221,7 @@ extension ViewController : MKMapViewDelegate {
     
     
     
-    func mapView(mapView: MKMapView!, viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
             // return nil so map view draws "blue dot" for standard user location
             return nil
@@ -245,11 +248,11 @@ extension ViewController : MKMapViewDelegate {
         return annotationView;
     }
     
-    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         self.clusteringController.refresh(true)
     }
     
-    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         if view.annotation is KPAnnotation {
             let cluster = view.annotation as! KPAnnotation
             
