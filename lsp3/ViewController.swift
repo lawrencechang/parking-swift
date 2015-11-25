@@ -221,7 +221,7 @@ extension ViewController : MKMapViewDelegate {
         //annotationView.canShowCallout = true; // For title pop up
         return annotationView
     }
-    */    
+    */
     
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKUserLocation {
