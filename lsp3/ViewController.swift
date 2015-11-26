@@ -13,10 +13,11 @@ import MapKit
 import CoreLocation
 import kingpin
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     var locations = [NSManagedObject]()
+    var locationManager = CLLocationManager();
     // Notes:
     // Quite choppy at 3k annotations
     let MAX_ANNOTATIONS = 10000;
@@ -25,10 +26,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         mapView.rotateEnabled = false;
         mapView.pitchEnabled = false;
-        mapView.showsUserLocation = true; // This seems to do nothing on its own
+        userLocation();
         initialize();
     }
     
@@ -37,33 +37,26 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
         locations.removeAll();
     }
-/*
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated);
-    }
-*/
     
-    // func - if num elements in core data is 0, load from JSON
-    //        else load to array?
+    // User location stuff
+    func userLocation() {
+        locationManager.delegate = self;
+        locationManager.requestWhenInUseAuthorization();
+        mapView.showsUserLocation = true; // This seems to do nothing on its own
+    }
+    
+    // If num elements in core data is 0, load from JSON
+    // else load to array?
     func initialize() {
         centerMap();
         
         print ("Checking for existing data in Core Data.");
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedContext = appDelegate.managedObjectContext
-        
-        let fetchRequest = NSFetchRequest(entityName: "Location")
-        
-        do {
-            let results = try managedContext.executeFetchRequest(fetchRequest)
-            locations = results as! [NSManagedObject]
-        } catch let error as NSError {
-            print("Could not fetch \(error), \(error.userInfo)")
-        }
+        loadFromCoreDataToArray();
         
         if locations.count == 0 {
             print("Core data was empty. Loading JSON. This will take a while.");
             loadJson();
+            loadFromCoreDataToArray();
         }
         else {
             print("Core data populated already. Loaded "+String(locations.count)+" locations.");
@@ -74,8 +67,19 @@ class ViewController: UIViewController {
         }
     }
     
+    func loadFromCoreDataToArray() {
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let managedContext = appDelegate.managedObjectContext
+        let fetchRequest = NSFetchRequest(entityName: "Location")
+        do {
+            let results = try managedContext.executeFetchRequest(fetchRequest)
+            locations = results as! [NSManagedObject]
+        } catch let error as NSError {
+            print("Could not fetch \(error), \(error.userInfo)")
+        }
+    }
     
-    // func - load from JSON, save into core data
+    // Load from JSON, save into core data
     func loadJson() {
         var currentID : Int;
         var latitude : Double;
