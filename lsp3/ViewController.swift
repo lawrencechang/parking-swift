@@ -18,7 +18,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var mapView: MKMapView!
     var locations = [NSManagedObject]()
     var locationManager = CLLocationManager();
-    // Notes:
     // Quite choppy at 3k annotations
     let MAX_ANNOTATIONS = 10000;
     
@@ -97,20 +96,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 let data = try NSData(contentsOfURL: NSURL(fileURLWithPath: path), options: NSDataReadingOptions.DataReadingMappedIfSafe)
                 print("Opening JSON file.");
                 let jsonObj = JSON(data: data)
-                print ("Done");
+                print ("JSON file opened.");
                 if jsonObj != JSON.null {
                     if let features = jsonObj["features"].array {
                         // Create array of points
                         var counter = 0;
-                        print("Saving locations from geojson.");
+                        print("Saving locations from geojson to Core Data.");
+                        let startTime = NSDate();
                         for feature in features {
-                            /*
-                            if counter < 500 {
-                            }
-                            else {
-                                //break;
-                            }
-                            */
                             counter++;
                             currentID = feature["properties"]["OBJECTID"].int!;
                             latitude = feature["properties"]["LATITUDE"].double!;
@@ -121,7 +114,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                             saveLocations(currentID,latitude: latitude,longitude: longitude,text: text,
                                 mapDelegate: appDelegate, managedContext: managedContext);
                         }
-                        print("Done.");
+                        print("Data saved.");
+                        let endTime = NSDate();
+                        print("["+String(endTime.timeIntervalSinceDate(startTime))+" seconds elapsed.]");
                     }
                 } else {
                     print("could not get json from file, make sure that file contains valid json.")
