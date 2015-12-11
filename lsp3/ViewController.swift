@@ -11,7 +11,6 @@ import SwiftyJSON
 import CoreData
 import MapKit
 import CoreLocation
-import kingpin
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
 
@@ -19,9 +18,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var locations = [NSManagedObject]()
     var locationManager = CLLocationManager();
     // Quite choppy at 3k annotations
-    let MAX_ANNOTATIONS = 10000;
-    
-    private var clusteringController : KPClusteringController!
+    let MAX_ANNOTATIONS = 1000;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,12 +26,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         mapView.pitchEnabled = false;
         userLocation();
         initialize();
+        currentDayAndTime();
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
         locations.removeAll();
+        initialize();
     }
     
     // User location stuff
@@ -67,6 +66,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func loadFromCoreDataToArray() {
+        print("Loading from Core Data to array.");
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         let managedContext = appDelegate.managedObjectContext
         let fetchRequest = NSFetchRequest(entityName: "Location")
@@ -76,16 +76,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         } catch let error as NSError {
             print("Could not fetch \(error), \(error.userInfo)")
         }
+        print("Loaded.");
+        
+        // Debug
+        /*
+        print("number of elements in locations array: "+String(locations.count));
+        if (locations.count <= 0) {
+            
+        } else {
+            let currentLat = locations[0].valueForKey("latitude") as! Double;
+            let currentLong = locations[0].valueForKey("longitude") as! Double;
+            print("location[0]: " + String(currentLat) + " " + String(currentLong) );
+        }
+        */
+        
     }
     
-    // Load from JSON, save into core data
-    func loadJson() {
+    // Load from geo JSON, save into core data
+    func loadGeoJson() {
         var currentID : Int;
         var latitude : Double;
         var longitude : Double;
         var text : String;
-        let filename = "signs_parking";
-        let filetype = "geojson";
+        let filename = "signs_parking"; let filetype = "geojson";
         
         // For saving to Core Data
         let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate;
@@ -105,6 +118,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                         let startTime = NSDate();
                         for feature in features {
                             counter++;
+                            
                             currentID = feature["properties"]["OBJECTID"].int!;
                             latitude = feature["properties"]["LATITUDE"].double!;
                             longitude = feature["properties"]["LONGITUDE"].double!;
@@ -130,6 +144,58 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
+    // Load from JSON, save into core data
+    func loadJson() {
+        var currentID : Int;
+        var latitude : Double;
+        var longitude : Double;
+        var text : String;
+        var description : String;
+        let filename = "signs_locations"; let filetype = "json";
+        
+        // For saving to Core Data
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate;
+        let managedContext = appDelegate.managedObjectContext;
+        
+        if let path = NSBundle.mainBundle().pathForResource(filename, ofType: filetype) {
+            do {
+                let data = try NSData(contentsOfURL: NSURL(fileURLWithPath: path), options: NSDataReadingOptions.DataReadingMappedIfSafe)
+                print("Opening JSON file: "+filename+"."+filetype);
+                let jsonObj = JSON(data: data)
+                print ("JSON file opened.");
+                if jsonObj != JSON.null {
+                    print("Saving locations from geojson to Core Data.");
+                    let startTime = NSDate();
+                    var counter = 0;
+                    for (key,subJson):(String,JSON) in jsonObj {
+                        counter++;
+                        if (counter % 100 == 0) {
+                            print(counter);
+                        }
+                        currentID = subJson["id"].int!;
+                        latitude = subJson["latitude"].double!;
+                        longitude = subJson["longitude"].double!;
+                        text = subJson["time1"].string! + ", " + subJson["time2"].string!;
+                        // Save to core data
+                        saveLocations(currentID,latitude: latitude,longitude: longitude,text: text,
+                            mapDelegate: appDelegate, managedContext: managedContext);
+                    }
+                    print("Data saved.");
+                    let endTime = NSDate();
+                    print("["+String(endTime.timeIntervalSinceDate(startTime))+" seconds elapsed.]");
+                    print("We found "+String(counter)+" items.");
+                } else {
+                    print("could not get json from file, make sure that file contains valid json.")
+                }
+                
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
+        } else {
+            print("Invalid filename/path.")
+        }
+    }
+
     func saveLocations(currentID : Int, latitude: Double, longitude: Double, text: String, mapDelegate : AppDelegate, managedContext : NSManagedObjectContext) {
         let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext);
         let currentLocation = NSManagedObject(entity: entity!, insertIntoManagedObjectContext: managedContext);
@@ -151,19 +217,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func annotations() {
         print("Creating annotations.");
         
-        //kingpin
-        let algorithm : KPGridClusteringAlgorithm = KPGridClusteringAlgorithm()
-        algorithm.annotationSize = CGSizeMake(25, 50)
-        //algorithm.clusteringStrategy = KPGridClusteringAlgorithmStrategy.TwoPhase;
-        algorithm.clusteringStrategy = KPGridClusteringAlgorithmStrategy.Basic;
-        clusteringController = KPClusteringController(mapView: self.mapView, clusteringAlgorithm: algorithm)
-        clusteringController.delegate = self // If you want to use delegate methods
-        
-        self.mapView.delegate = self;
-        
         dispatch_async(dispatch_get_main_queue()) {
+            var counter = 0;
             var annotations = [MKAnnotation]();
             for location in self.locations {
+                counter++;
                 let annotation = MKPointAnnotation();
                 annotation.coordinate = CLLocationCoordinate2DMake(location.valueForKey("latitude") as! Double, location.valueForKey("longitude") as! Double);
                 annotation.title = location.valueForKey("text") as? String;
@@ -173,12 +231,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     break;
                 }
             }
-            //self.mapView.addAnnotations(annotations);
-            
-            // kingpin
-            self.clusteringController.setAnnotations(annotations);
-            print("Done adding annotations.");
-            self.clusteringController.refresh(true); // To trigger displaying the annotations in the beginning
+            self.mapView.addAnnotations(annotations);
+            print("Done adding " + String(counter) + " annotations.");
         }
     }
     
@@ -186,101 +240,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(34.026008, -118.479254), 12000, 12000)
         mapView.setRegion(region, animated: true)
     }
-}
-
-extension ViewController : MKMapViewDelegate {
-    /*
-    func mapView(mapView: MKMapView, viewForAnnotationSlow annotation: MKAnnotation) -> MKAnnotationView? {
-        // simple and inefficient example
-        let annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "reuse identifier string");
-        if Int(annotation.subtitle! as String!)! % 2 == 0 {
-            annotationView.pinTintColor = UIColor.purpleColor();
-        } else {
-            annotationView.pinTintColor = UIColor.orangeColor();
-        }
-        //annotationView.animatesDrop = true; // For fun :)
-        annotationView.canShowCallout = true; // For title pop up
-        return annotationView
-    }
     
-    func mapView(mapView: MKMapView, viewForAnnotationReuse annotation: MKAnnotation) -> MKAnnotationView? {
-        var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("reuse");
-        if annotationView != nil {
-            annotationView!.annotation = annotation;
-        } else {
-            annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "reuse");
-        }
-        /*
-        if Int(annotation.subtitle! as String!)! % 2 == 0 {
-            annotationView.pinTintColor = UIColor.purpleColor();
-        } else {
-            annotationView.pinTintColor = UIColor.orangeColor();
-        }
-        */
-        //annotationView.canShowCallout = true; // For title pop up
-        return annotationView
-    }
-    */
-    
-    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
-        if annotation is MKUserLocation {
-            // return nil so map view draws "blue dot" for standard user location
-            return nil
-        }
-        var annotationView : MKPinAnnotationView?
-        if annotation is KPAnnotation {
-            let a = annotation as! KPAnnotation
-            if a.isCluster() {
-                annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("cluster") as? MKPinAnnotationView
-                if (annotationView == nil) {
-                    annotationView = MKPinAnnotationView(annotation: a, reuseIdentifier: "cluster")
-                }
-                annotationView!.pinTintColor = UIColor.purpleColor();
-            }
-            else {
-                annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier("pin") as? MKPinAnnotationView
-                if (annotationView == nil) {
-                    annotationView = MKPinAnnotationView(annotation: a, reuseIdentifier: "pin")
-                }
-                annotationView!.pinTintColor = UIColor.redColor();
-            }
-            annotationView!.canShowCallout = true;
-        }
-        return annotationView;
-    }
-    
-    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        self.clusteringController.refresh(true)
-    }
-    
-    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        if view.annotation is KPAnnotation {
-            let cluster = view.annotation as! KPAnnotation
-            
-            if cluster.annotations.count > 1 {
-                let region = MKCoordinateRegionMakeWithDistance(cluster.coordinate,
-                    cluster.radius * 2.5,
-                    cluster.radius * 2.5)
-                
-                mapView.setRegion(region, animated: true)
-            }
-        }
+    func currentDayAndTime() {
+        // From: http://stackoverflow.com/questions/24070450/how-to-get-the-current-time-and-hour-as-datetime/32445947#32445947
+        let date = NSDate()
+        let calendar = NSCalendar.currentCalendar()
+        let components = calendar.components([.Weekday, .Hour, .Minute], fromDate: date)
+        let hour = components.hour
+        let minute = components.minute
+        let day = components.weekday
+        print("Current day is: "+String(day));
+        print("Current hour is: "+String(hour));
+        print("Current minute is: "+String(minute));
     }
 }
-
-extension ViewController : KPClusteringControllerDelegate {
-    func clusteringControllerShouldClusterAnnotations(clusteringController: KPClusteringController!) -> Bool {
-        // Smaller number, takes more zooming in to turn off clustering
-        return self.mapView.region.span.latitudeDelta > 0.006;
-    }
-    
-    func clusteringController(clusteringController: KPClusteringController!, configureAnnotationForDisplay annotation: KPAnnotation!) {
-        if annotation.isCluster() {
-            
-        } else {
-            
-        }
-    }
-    
-}
-
