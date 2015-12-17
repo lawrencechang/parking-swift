@@ -5,8 +5,110 @@
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="objectid" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="times" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Times" inverseName="location" inverseEntity="Times" syncable="YES"/>
+    </entity>
+    <entity name="Times" syncable="YES">
+        <attribute name="day" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="t0000" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0015" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0030" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0045" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0100" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0115" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0130" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0145" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0200" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0215" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0230" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0245" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0300" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0315" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0330" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0345" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0400" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0415" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0430" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0445" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0500" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0515" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0530" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0545" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0600" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0615" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0630" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0645" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0700" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0715" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0730" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0745" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0800" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0815" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0830" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0845" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0900" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0915" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0930" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t0945" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1000" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1015" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1030" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1045" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1100" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1115" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1130" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1145" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1200" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1215" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1230" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1245" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1300" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1315" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1330" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1345" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1400" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1415" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1430" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1445" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1500" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1515" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1530" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1545" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1600" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1615" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1630" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1645" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1700" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1715" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1730" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1745" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1800" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1815" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1830" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1845" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1900" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1915" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1930" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t1945" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2000" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2015" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2030" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2045" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2100" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2115" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2130" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2145" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2200" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2215" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2230" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2245" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2300" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2315" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2330" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="t2345" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <relationship name="location" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Location" inverseName="times" inverseEntity="Location" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Location" positionX="-63" positionY="-18" width="128" height="103"/>
+        <element name="Location" positionX="-261" positionY="26" width="128" height="118"/>
+        <element name="Times" positionX="43" positionY="86" width="128" height="1513"/>
     </elements>
 </model>

@@ -92,58 +92,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
     }
     
-    // Load from geo JSON, save into core data
-    func loadGeoJson() {
-        var currentID : Int;
-        var latitude : Double;
-        var longitude : Double;
-        var text : String;
-        let filename = "signs_parking"; let filetype = "geojson";
-        
-        // For saving to Core Data
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate;
-        let managedContext = appDelegate.managedObjectContext;
-        
-        if let path = NSBundle.mainBundle().pathForResource(filename, ofType: filetype) {
-            do {
-                let data = try NSData(contentsOfURL: NSURL(fileURLWithPath: path), options: NSDataReadingOptions.DataReadingMappedIfSafe)
-                print("Opening JSON file.");
-                let jsonObj = JSON(data: data)
-                print ("JSON file opened.");
-                if jsonObj != JSON.null {
-                    if let features = jsonObj["features"].array {
-                        // Create array of points
-                        var counter = 0;
-                        print("Saving locations from geojson to Core Data.");
-                        let startTime = NSDate();
-                        for feature in features {
-                            counter++;
-                            
-                            currentID = feature["properties"]["OBJECTID"].int!;
-                            latitude = feature["properties"]["LATITUDE"].double!;
-                            longitude = feature["properties"]["LONGITUDE"].double!;
-                            text = feature["properties"]["LIB__DESCR"].string!;
-                            
-                            // Save to core data
-                            saveLocations(currentID,latitude: latitude,longitude: longitude,text: text,
-                                mapDelegate: appDelegate, managedContext: managedContext);
-                        }
-                        print("Data saved.");
-                        let endTime = NSDate();
-                        print("["+String(endTime.timeIntervalSinceDate(startTime))+" seconds elapsed.]");
-                    }
-                } else {
-                    print("could not get json from file, make sure that file contains valid json.")
-                }
-                
-            } catch let error as NSError {
-                print(error.localizedDescription)
-            }
-        } else {
-            print("Invalid filename/path.")
-        }
-    }
-    
     // Load from JSON, save into core data
     func loadJson() {
         var currentID : Int;
@@ -167,18 +115,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                     print("Saving locations from geojson to Core Data.");
                     let startTime = NSDate();
                     var counter = 0;
-                    for (key,subJson):(String,JSON) in jsonObj {
+                    for (locationKey,subJson):(String,JSON) in jsonObj {
                         counter++;
                         if (counter % 100 == 0) {
                             print(counter);
+                        }
+                        if (counter >= MAX_ANNOTATIONS) {
+                            break;
                         }
                         currentID = subJson["id"].int!;
                         latitude = subJson["latitude"].double!;
                         longitude = subJson["longitude"].double!;
                         text = subJson["time1"].string! + ", " + subJson["time2"].string!;
+                        
+                        let sundayBools = boolsFromTimesInJson("sun",jsonObject : subJson);
+                        let mondayBools = boolsFromTimesInJson("mon",jsonObject : subJson);
+                        let tuesdayBools = boolsFromTimesInJson("tues",jsonObject : subJson);
+                        let wednesdayBools = boolsFromTimesInJson("wed",jsonObject : subJson);
+                        let thursdayBools = boolsFromTimesInJson("thurs",jsonObject : subJson);
+                        let fridayBools = boolsFromTimesInJson("fri",jsonObject : subJson);
+                        let saturdayBools = boolsFromTimesInJson("sat",jsonObject : subJson);
+                        
                         // Save to core data
                         saveLocations(currentID,latitude: latitude,longitude: longitude,text: text,
-                            mapDelegate: appDelegate, managedContext: managedContext);
+                            mapDelegate: appDelegate, managedContext: managedContext,
+                            sundayBools: sundayBools,
+                            mondayBools: mondayBools,
+                            tuesdayBools: tuesdayBools,
+                            wednesdayBools: wednesdayBools,
+                            thursdayBools: thursdayBools,
+                            fridayBools: fridayBools,
+                            saturdayBools: saturdayBools
+                        );
                     }
                     print("Data saved.");
                     let endTime = NSDate();
@@ -196,14 +164,33 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
 
-    func saveLocations(currentID : Int, latitude: Double, longitude: Double, text: String, mapDelegate : AppDelegate, managedContext : NSManagedObjectContext) {
-        let entity = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext);
-        let currentLocation = NSManagedObject(entity: entity!, insertIntoManagedObjectContext: managedContext);
-            
+    func saveLocations(currentID : Int, latitude: Double, longitude: Double, text: String, mapDelegate : AppDelegate, managedContext : NSManagedObjectContext,
+        sundayBools : Array<Bool>,
+        mondayBools : Array<Bool>,
+        tuesdayBools : Array<Bool>,
+        wednesdayBools : Array<Bool>,
+        thursdayBools : Array<Bool>,
+        fridayBools : Array<Bool>,
+        saturdayBools : Array<Bool>
+    ) {
+        let entityLocation = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext);
+        let currentLocation = NSManagedObject(entity: entityLocation!, insertIntoManagedObjectContext: managedContext);
+        let entityTimes = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimes = NSManagedObject(entity: entityTimes!, insertIntoManagedObjectContext: managedContext);
+
         currentLocation.setValue(currentID, forKey: "objectid");
         currentLocation.setValue(latitude, forKey: "latitude");
         currentLocation.setValue(longitude, forKey: "longitude");
         currentLocation.setValue(text, forKey: "text");
+        
+        let times = timesArray("t", withColon: false);
+        for (index,time) in times.enumerate() {
+            currentTimes.setValue(sundayBools[index], forKey: time);
+        }
+        //currentTimes.setValue(fri0000, forKey: "t0000");
+        currentTimes.setValue(6, forKey: "day");
+        
+        currentLocation.setValue(NSSet(object: currentTimes), forKey: "times");
         
         do {
             try managedContext.save();
@@ -217,14 +204,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func annotations() {
         print("Creating annotations.");
         
-        dispatch_async(dispatch_get_main_queue()) {
+        //dispatch_async(dispatch_get_main_queue()) {
             var counter = 0;
             var annotations = [MKAnnotation]();
             for location in self.locations {
                 counter++;
                 let annotation = MKPointAnnotation();
                 annotation.coordinate = CLLocationCoordinate2DMake(location.valueForKey("latitude") as! Double, location.valueForKey("longitude") as! Double);
-                annotation.title = location.valueForKey("text") as? String;
+                
+                let times = location.valueForKey("times")!;
+                //print ("times has "+String(times.count)+" entries.");
+                annotation.title = location.valueForKey("latitude") as? String;
+                let fri0000 = times.allObjects[0].valueForKey("t0000") as! Bool;
+                annotation.title = fri0000 ? "true" : "false";
                 annotation.subtitle = String(location.valueForKey("objectid") as! Int);
                 annotations.append(annotation);
                 if annotations.count >= self.MAX_ANNOTATIONS {
@@ -233,7 +225,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }
             self.mapView.addAnnotations(annotations);
             print("Done adding " + String(counter) + " annotations.");
-        }
+        //}
     }
     
     func centerMap() {
@@ -252,5 +244,48 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         print("Current day is: "+String(day));
         print("Current hour is: "+String(hour));
         print("Current minute is: "+String(minute));
+    }
+    
+    // If given "fri", returns ["fri00:00","fri00:15",...,"fri23:45"]
+    func timesArray(day : String, withColon : Bool) -> Array<String> {
+        let hours = ["00","01","02","03","04","05","06","07","08","09","10","11",
+            "12","13","14","15","16","17","18","19","20","21","22","23"];
+        let minutes = ["00","15","30","45"];
+        var colon : String;
+        if withColon {
+            colon = ":";
+        } else {
+            colon = "";
+        }
+        var currentString = "";
+        var resultArray = [String]();
+        for hour in hours {
+            for minute in minutes {
+                currentString = day+hour+colon+minute;
+                resultArray.append(currentString);
+            }
+        }
+        return resultArray;
+    }
+    
+    /*
+    func timesArray(withColon : Bool) -> Array<String> {
+        return dayAndTimesArray("t", withColon: withColon);
+    }
+    */
+    
+    // given a day designation, and a json object
+    // Go through the fields corresponding to all times in that day
+    // Fill in boolean array as we go
+    // Return array
+    func boolsFromTimesInJson(day : String, jsonObject : JSON) -> Array<Bool> {
+        var result = [Bool]();
+        var currentBool = false;
+        let times = timesArray(day, withColon : true);
+        for time in times {
+            currentBool = (jsonObject[time].string! == "T") ? true : false;
+            result.append(currentBool);
+        }
+        return result;
     }
 }
