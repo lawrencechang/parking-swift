@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0437D56B1C1A278A002746A7 /* signs_locations.json in Resources */ = {isa = PBXBuildFile; fileRef = 0437D56A1C1A278A002746A7 /* signs_locations.json */; };
+		047366B41C2A2649000ADB69 /* reddot.png in Resources */ = {isa = PBXBuildFile; fileRef = 047366B31C2A2649000ADB69 /* reddot.png */; };
+		047366B61C2A53DF000ADB69 /* greendot.png in Resources */ = {isa = PBXBuildFile; fileRef = 047366B51C2A53DF000ADB69 /* greendot.png */; };
+		047366B81C2A57FB000ADB69 /* LawAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047366B71C2A57FB000ADB69 /* LawAnnotation.swift */; };
+		047366BA1C2B7B7E000ADB69 /* signs_locations.json in Resources */ = {isa = PBXBuildFile; fileRef = 047366B91C2B7B7E000ADB69 /* signs_locations.json */; };
 		047B624B1BFB139C00023FD3 /* kingpin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 047B624A1BFB139C00023FD3 /* kingpin.framework */; };
 		049DA6811BF30ECA00D28F41 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049DA6801BF30ECA00D28F41 /* AppDelegate.swift */; };
 		049DA6831BF30ECA00D28F41 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049DA6821BF30ECA00D28F41 /* ViewController.swift */; };
@@ -39,7 +42,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0437D56A1C1A278A002746A7 /* signs_locations.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = signs_locations.json; sourceTree = "<group>"; };
+		047366B31C2A2649000ADB69 /* reddot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reddot.png; sourceTree = "<group>"; };
+		047366B51C2A53DF000ADB69 /* greendot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greendot.png; sourceTree = "<group>"; };
+		047366B71C2A57FB000ADB69 /* LawAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LawAnnotation.swift; sourceTree = "<group>"; };
+		047366B91C2B7B7E000ADB69 /* signs_locations.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = signs_locations.json; sourceTree = "<group>"; };
 		047B624A1BFB139C00023FD3 /* kingpin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = kingpin.framework; path = "Pods/../build/Debug-iphoneos/kingpin.framework"; sourceTree = "<group>"; };
 		049DA67D1BF30ECA00D28F41 /* lsp3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = lsp3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049DA6801BF30ECA00D28F41 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -89,6 +95,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		047366B21C2A2634000ADB69 /* files */ = {
+			isa = PBXGroup;
+			children = (
+				047366B91C2B7B7E000ADB69 /* signs_locations.json */,
+				047366B51C2A53DF000ADB69 /* greendot.png */,
+				047366B31C2A2649000ADB69 /* reddot.png */,
+			);
+			name = files;
+			sourceTree = "<group>";
+		};
 		049DA6741BF30ECA00D28F41 = {
 			isa = PBXGroup;
 			children = (
@@ -114,6 +130,7 @@
 		049DA67F1BF30ECA00D28F41 /* lsp3 */ = {
 			isa = PBXGroup;
 			children = (
+				047366B21C2A2634000ADB69 /* files */,
 				049DA6801BF30ECA00D28F41 /* AppDelegate.swift */,
 				049DA6821BF30ECA00D28F41 /* ViewController.swift */,
 				049DA6841BF30ECA00D28F41 /* Main.storyboard */,
@@ -121,7 +138,7 @@
 				049DA68C1BF30ECA00D28F41 /* LaunchScreen.storyboard */,
 				049DA68F1BF30ECA00D28F41 /* Info.plist */,
 				049DA6871BF30ECA00D28F41 /* lsp3.xcdatamodeld */,
-				0437D56A1C1A278A002746A7 /* signs_locations.json */,
+				047366B71C2A57FB000ADB69 /* LawAnnotation.swift */,
 			);
 			path = lsp3;
 			sourceTree = "<group>";
@@ -273,9 +290,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				047366B41C2A2649000ADB69 /* reddot.png in Resources */,
+				047366BA1C2B7B7E000ADB69 /* signs_locations.json in Resources */,
 				049DA68E1BF30ECA00D28F41 /* LaunchScreen.storyboard in Resources */,
 				049DA68B1BF30ECA00D28F41 /* Assets.xcassets in Resources */,
-				0437D56B1C1A278A002746A7 /* signs_locations.json in Resources */,
+				047366B61C2A53DF000ADB69 /* greendot.png in Resources */,
 				049DA6861BF30ECA00D28F41 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -350,6 +369,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				049DA6831BF30ECA00D28F41 /* ViewController.swift in Sources */,
+				047366B81C2A57FB000ADB69 /* LawAnnotation.swift in Sources */,
 				049DA6811BF30ECA00D28F41 /* AppDelegate.swift in Sources */,
 				049DA6891BF30ECA00D28F41 /* lsp3.xcdatamodeld in Sources */,
 			);

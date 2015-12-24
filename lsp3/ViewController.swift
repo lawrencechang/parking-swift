@@ -12,7 +12,7 @@ import CoreData
 import MapKit
 import CoreLocation
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     var locations = [NSManagedObject]()
@@ -27,6 +27,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         userLocation();
         initialize();
         currentDayAndTime();
+        
+        mapView.delegate = self;
     }
     
     override func didReceiveMemoryWarning() {
@@ -175,22 +177,52 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     ) {
         let entityLocation = NSEntityDescription.entityForName("Location", inManagedObjectContext: managedContext);
         let currentLocation = NSManagedObject(entity: entityLocation!, insertIntoManagedObjectContext: managedContext);
-        let entityTimes = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
-        let currentTimes = NSManagedObject(entity: entityTimes!, insertIntoManagedObjectContext: managedContext);
+        
+        let entityTimesSun = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimesSun = NSManagedObject(entity: entityTimesSun!, insertIntoManagedObjectContext: managedContext);
+        let entityTimesMon = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimesMon = NSManagedObject(entity: entityTimesMon!, insertIntoManagedObjectContext: managedContext);
+        let entityTimesTues = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimesTues = NSManagedObject(entity: entityTimesTues!, insertIntoManagedObjectContext: managedContext);
+        let entityTimesWed = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimesWed = NSManagedObject(entity: entityTimesWed!, insertIntoManagedObjectContext: managedContext);
+        let entityTimesThurs = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimesThurs = NSManagedObject(entity: entityTimesThurs!, insertIntoManagedObjectContext: managedContext);
+        let entityTimesFri = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimesFri = NSManagedObject(entity: entityTimesFri!, insertIntoManagedObjectContext: managedContext);
+        let entityTimesSat = NSEntityDescription.entityForName("Times", inManagedObjectContext: managedContext);
+        let currentTimesSat = NSManagedObject(entity: entityTimesSat!, insertIntoManagedObjectContext: managedContext);
 
         currentLocation.setValue(currentID, forKey: "objectid");
         currentLocation.setValue(latitude, forKey: "latitude");
         currentLocation.setValue(longitude, forKey: "longitude");
         currentLocation.setValue(text, forKey: "text");
         
+        currentTimesSun.setValue(0,forKey:"day");
+        currentTimesMon.setValue(0,forKey:"day");
+        currentTimesTues.setValue(0,forKey:"day");
+        currentTimesWed.setValue(0,forKey:"day");
+        currentTimesThurs.setValue(0,forKey:"day");
+        currentTimesFri.setValue(0,forKey:"day");
+        currentTimesSat.setValue(0,forKey:"day");
         let times = timesArray("t", withColon: false);
-        for (index,time) in times.enumerate() {
-            currentTimes.setValue(sundayBools[index], forKey: time);
-        }
-        //currentTimes.setValue(fri0000, forKey: "t0000");
-        currentTimes.setValue(6, forKey: "day");
+        for (index,time) in times.enumerate() { currentTimesSun.setValue(sundayBools[index], forKey: time);}
+        for (index,time) in times.enumerate() { currentTimesMon.setValue(mondayBools[index], forKey: time);}
+        for (index,time) in times.enumerate() { currentTimesTues.setValue(tuesdayBools[index], forKey: time);}
+        for (index,time) in times.enumerate() { currentTimesWed.setValue(wednesdayBools[index], forKey: time);}
+        for (index,time) in times.enumerate() { currentTimesThurs.setValue(thursdayBools[index], forKey: time);}
+        for (index,time) in times.enumerate() { currentTimesFri.setValue(fridayBools[index], forKey: time);}
+        for (index,time) in times.enumerate() { currentTimesSat.setValue(saturdayBools[index], forKey: time);}
         
-        currentLocation.setValue(NSSet(object: currentTimes), forKey: "times");
+        let timesSet = NSMutableSet();
+        timesSet.addObject(currentTimesSun);
+        timesSet.addObject(currentTimesMon);
+        timesSet.addObject(currentTimesTues);
+        timesSet.addObject(currentTimesWed);
+        timesSet.addObject(currentTimesThurs);
+        timesSet.addObject(currentTimesFri);
+        timesSet.addObject(currentTimesSat);
+        currentLocation.setValue(timesSet, forKey: "times");
         
         do {
             try managedContext.save();
@@ -207,17 +239,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         //dispatch_async(dispatch_get_main_queue()) {
             var counter = 0;
             var annotations = [MKAnnotation]();
+            let times = timesArray("t", withColon: false);
+            let (currentDay,currentHour,currentMinute) = currentTimeRounded();
+            let currentTimeFieldname = "t"+String(currentHour)+String(currentMinute);
             for location in self.locations {
                 counter++;
-                let annotation = MKPointAnnotation();
+                let annotation = LawAnnotation();
                 annotation.coordinate = CLLocationCoordinate2DMake(location.valueForKey("latitude") as! Double, location.valueForKey("longitude") as! Double);
                 
                 let times = location.valueForKey("times")!;
                 //print ("times has "+String(times.count)+" entries.");
                 annotation.title = location.valueForKey("latitude") as? String;
-                let fri0000 = times.allObjects[0].valueForKey("t0000") as! Bool;
-                annotation.title = fri0000 ? "true" : "false";
-                annotation.subtitle = String(location.valueForKey("objectid") as! Int);
+                //if (times.allObjects[currentDay].valueForKey(currentTimeFieldname) as! Bool == true) {
+                annotation.setParkingAllowed(false);
+                if (times.allObjects[0].valueForKey(currentTimeFieldname) as! Bool == true) {
+                    annotation.title = "allowed: "+currentTimeFieldname;
+                    annotation.setParkingAllowed(true);
+                }
+                else { annotation.title = "not allowed: "+currentTimeFieldname; }
+                annotation.subtitle = String(location.valueForKey("text"));
                 annotations.append(annotation);
                 if annotations.count >= self.MAX_ANNOTATIONS {
                     break;
@@ -246,6 +286,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         print("Current minute is: "+String(minute));
     }
     
+    func currentTimeRounded() -> (day: Int, hour: String, minute: String){
+        let date = NSDate()
+        let calendar = NSCalendar.currentCalendar()
+        let components = calendar.components([.Weekday, .Hour, .Minute], fromDate: date)
+        let hour = components.hour
+        let minute = components.minute
+        let day = components.weekday
+        if (minute < 15) { return (day,addLeadingZero(String(hour)),"00");}
+        else if (minute < 30) {return (day,addLeadingZero(String(hour)),"15");}
+        else if (minute < 45) {return (day,addLeadingZero(String(hour)),"30");}
+        else {return (day,addLeadingZero(String(hour)),"45");}
+
+    }
+    
+    func addLeadingZero(number : String) -> String {
+        if (number.characters.count == 1) {
+            return "0"+number;
+        }
+        return number;
+    }
+    
     // If given "fri", returns ["fri00:00","fri00:15",...,"fri23:45"]
     func timesArray(day : String, withColon : Bool) -> Array<String> {
         let hours = ["00","01","02","03","04","05","06","07","08","09","10","11",
@@ -268,12 +329,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         return resultArray;
     }
     
-    /*
-    func timesArray(withColon : Bool) -> Array<String> {
-        return dayAndTimesArray("t", withColon: withColon);
-    }
-    */
-    
     // given a day designation, and a json object
     // Go through the fields corresponding to all times in that day
     // Fill in boolean array as we go
@@ -285,7 +340,31 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         for time in times {
             currentBool = (jsonObject[time].string! == "T") ? true : false;
             result.append(currentBool);
+            //if (!currentBool) { print("Found F aka false in boolsFromTimesInJson.") }
         }
         return result;
     }
+    
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+        // simple and inefficient example
+        
+        let annotationView = MKAnnotationView()
+        annotationView.canShowCallout = true;
+        
+        annotationView.image = UIImage(named: "reddot.png");
+        
+        if let currentAnnotation = annotation as? LawAnnotation {
+            if currentAnnotation.isParkingAllowed() {
+                annotationView.image = UIImage(named: "greendot.png");
+            }
+        }
+        else {
+            return nil
+        }
+        
+        
+        
+        return annotationView
+    }
 }
+
