@@ -19,6 +19,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     var locationManager = CLLocationManager();
     // Quite choppy at 3k annotations
     let MAX_ANNOTATIONS = 1000;
+    var timer = NSTimer();
+    
+    let debug = true;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +29,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         mapView.pitchEnabled = false;
         userLocation();
         initialize();
-        currentDayAndTime();
+        
+        if debug { printCurrentDayAndTime() }
         
         mapView.delegate = self;
     }
@@ -38,15 +42,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         initialize();
     }
     
-    // User location stuff
     func userLocation() {
         locationManager.delegate = self;
         locationManager.requestWhenInUseAuthorization();
         mapView.showsUserLocation = true; // This seems to do nothing on its own
     }
     
-    // If num elements in core data is 0, load from JSON
-    // else load to array?
+    // If no elements in Core Data, load from JSON
+    // else load from Core Data
     func initialize() {
         centerMap();
         
@@ -62,9 +65,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             print("Core data populated already. Loaded "+String(locations.count)+" locations.");
         }
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+        //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             self.annotations();
-        }
+            self.annotationsCaller();
+        //}
+    }
+    
+    func annotationsCaller() {
+        timer = NSTimer.scheduledTimerWithTimeInterval(60.0, target: self, selector: "annotations", userInfo: nil, repeats: true);
+        if debug {print("Called annotationsCaller.")}
     }
     
     func loadFromCoreDataToArray() {
@@ -80,18 +89,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         }
         print("Loaded.");
         
-        // Debug
-        /*
-        print("number of elements in locations array: "+String(locations.count));
-        if (locations.count <= 0) {
-            
-        } else {
-            let currentLat = locations[0].valueForKey("latitude") as! Double;
-            let currentLong = locations[0].valueForKey("longitude") as! Double;
-            print("location[0]: " + String(currentLat) + " " + String(currentLong) );
+        if debug {
+            print("number of elements in locations array: "+String(locations.count));
+            if (locations.count <= 0) {
+                
+            } else {
+                let currentLat = locations[0].valueForKey("latitude") as! Double;
+                let currentLong = locations[0].valueForKey("longitude") as! Double;
+                print("location[0]: " + String(currentLat) + " " + String(currentLong) );
+            }
         }
-        */
-        
     }
     
     // Load from JSON, save into core data
@@ -129,6 +136,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                         latitude = subJson["latitude"].double!;
                         longitude = subJson["longitude"].double!;
                         text = subJson["time1"].string! + ", " + subJson["time2"].string!;
+                        // TODO - need to combine rules' descriptions into a global "description" field, in preprocess
+                        //description = subJson["description"].string!;
                         
                         let sundayBools = boolsFromTimesInJson("sun",jsonObject : subJson);
                         let mondayBools = boolsFromTimesInJson("mon",jsonObject : subJson);
@@ -239,7 +248,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         //dispatch_async(dispatch_get_main_queue()) {
             var counter = 0;
             var annotations = [MKAnnotation]();
-            let times = timesArray("t", withColon: false);
             let (currentDay,currentHour,currentMinute) = currentTimeRounded();
             let currentTimeFieldname = "t"+String(currentHour)+String(currentMinute);
             for location in self.locations {
@@ -248,16 +256,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                 annotation.coordinate = CLLocationCoordinate2DMake(location.valueForKey("latitude") as! Double, location.valueForKey("longitude") as! Double);
                 
                 let times = location.valueForKey("times")!;
-                //print ("times has "+String(times.count)+" entries.");
-                annotation.title = location.valueForKey("latitude") as? String;
-                //if (times.allObjects[currentDay].valueForKey(currentTimeFieldname) as! Bool == true) {
                 annotation.setParkingAllowed(false);
+                annotation.title = location.valueForKey("text") as? String;
                 if (times.allObjects[0].valueForKey(currentTimeFieldname) as! Bool == true) {
-                    annotation.title = "allowed: "+currentTimeFieldname;
                     annotation.setParkingAllowed(true);
                 }
-                else { annotation.title = "not allowed: "+currentTimeFieldname; }
-                annotation.subtitle = String(location.valueForKey("text"));
+                annotation.subtitle = location.valueForKey("text") as? String;
                 annotations.append(annotation);
                 if annotations.count >= self.MAX_ANNOTATIONS {
                     break;
@@ -273,7 +277,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         mapView.setRegion(region, animated: true)
     }
     
-    func currentDayAndTime() {
+    func printCurrentDayAndTime() {
         // From: http://stackoverflow.com/questions/24070450/how-to-get-the-current-time-and-hour-as-datetime/32445947#32445947
         let date = NSDate()
         let calendar = NSCalendar.currentCalendar()
@@ -340,7 +344,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         for time in times {
             currentBool = (jsonObject[time].string! == "T") ? true : false;
             result.append(currentBool);
-            //if (!currentBool) { print("Found F aka false in boolsFromTimesInJson.") }
         }
         return result;
     }
@@ -358,12 +361,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                 annotationView.image = UIImage(named: "greendot.png");
             }
         }
-        else {
-            return nil
-        }
-        
-        
-        
+        else { return nil }
         return annotationView
     }
 }
